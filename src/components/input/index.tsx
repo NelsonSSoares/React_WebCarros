@@ -19,7 +19,7 @@ export function Input({ placeholder, type, name, register, errors, rules }: Inpu
                 {...(register ? register(name, rules) : {})}
                 id={name}
              />
-            {errors && <span className="text-red-500 text-sm">{errors}</span>}
+            {errors && <span className="text-red-500  my-1 text-sm">{errors}</span>}
         </div>
     )
 

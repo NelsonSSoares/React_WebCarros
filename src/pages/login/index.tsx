@@ -30,7 +30,7 @@ export function Login() {
           <img src={logoImg} alt="Logo" className="w-full" />
         </Link>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white max-w-xl w-full rou nded-lg">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white max-w-xl w-full rou nded-lg p-4">
           <div className="mb-3">
             <Input
             type="text"
@@ -51,8 +51,13 @@ export function Login() {
           />
 
           </div>
-          <button type="submit">Acessar</button>
+          <button type="submit"
+          className="bg-zinc-900 w-full rounded-md text-white h-10 font-medium"
+          >Acessar</button>
         </form>
+        <Link to="/register" className="text-zinc-600 hover:text-zinc-900">
+          Não tem uma conta? Cadastre-se
+        </Link>
       </div>
     </Container>
   );
