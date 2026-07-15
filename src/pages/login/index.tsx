@@ -5,6 +5,10 @@ import { Input } from '../../components/input';
 import { useForm} from "react-hook-form";
 import {z} from "zod";
 import { zodResolver } from '@hookform/resolvers/zod/src/index.js';
+import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
+import {auth} from '../../services/firebaseConnection';
+import { useNavigate } from 'react-router-dom';
+import {useEffect} from 'react';
 
 const schema = z.object({
   email: z.string().email("Digite um email válido").nonempty("O email é obrigatório"),
@@ -14,14 +18,31 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export function Login() {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState:{errors} } = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onChange",
   });
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    signInWithEmailAndPassword(auth, data.email, data.password)
+    .then((user)=>{
+      console.log("User logged in successfully", user);
+      navigate("/dashboard", {replace: true});
+    }).catch((error)=>{
+      console.log("Error logging in user:", error);
+    });
   }
+
+  useEffect(()=>{
+
+    async function handleSignOut() {
+      await signOut(auth);
+      console.log("User signed out successfully");
+    }
+    handleSignOut();
+  },[]);
+
 
   return (
     <Container>

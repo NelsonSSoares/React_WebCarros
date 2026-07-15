@@ -5,6 +5,10 @@ import { Input } from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod/src/index.js";
+import {auth} from '../../services/firebaseConnection';
+import { createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const schema = z.object({
   name: z.string().nonempty("O nome é obrigatório"),
@@ -21,6 +25,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function Register() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -30,10 +35,27 @@ export function Register() {
     mode: "onChange",
   });
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+    .then(async (user)=>{
+      await updateProfile(user.user, {
+        displayName: data.name,
+      })
+      console.log("User registered successfully");
+      navigate("/dashboard", {replace: true});
+    }).catch((error)=>{
+      console.log("Error registering user:", error);
+    });
   }
+  useEffect(()=>{
 
+    async function handleSignOut() {
+      await signOut(auth);
+      console.log("User signed out successfully");
+    }
+    handleSignOut();
+  },[]);
+  
   return (
     <Container>
       <div className="w-full min-h-screen flex justify-center items-center flex-col gap-4">
@@ -76,7 +98,7 @@ export function Register() {
             type="submit"
             className="bg-zinc-900 w-full rounded-md text-white h-10 font-medium"
           >
-            Acessar
+            Cadastrar
           </button>
         </form>
         <Link to="/login" className="text-zinc-600 hover:text-zinc-900">
