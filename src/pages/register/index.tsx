@@ -9,6 +9,8 @@ import {auth} from '../../services/firebaseConnection';
 import { createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const schema = z.object({
   name: z.string().nonempty("O nome é obrigatório"),
@@ -25,6 +27,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function Register() {
+  const { handleInfoUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
     register,
@@ -41,6 +44,11 @@ export function Register() {
       await updateProfile(user.user, {
         displayName: data.name,
       })
+      handleInfoUser({
+        uid: user.user.uid,
+        name: data.name,
+        email: data.email
+      });
       console.log("User registered successfully");
       navigate("/dashboard", {replace: true});
     }).catch((error)=>{
