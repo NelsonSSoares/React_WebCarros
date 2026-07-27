@@ -1,37 +1,70 @@
-import { Container } from "../../../components/container";
-import { PanelHeader } from "../../../components/PanelHeader";
-import { FiUpload } from "react-icons/fi";
-import { useForm } from "react-hook-form";
-import { Input } from "../../../components/input";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import { useForm } from "react-hook-form";
+import { FiUpload } from "react-icons/fi";
+import { z } from "zod";
+import { Container } from "../../../components/container";
+import { Input } from "../../../components/input";
+import { PanelHeader } from "../../../components/PanelHeader";
+import { AuthContext } from "../../../context/AuthContext";
 
 const schema = z.object({
-  name: z.string().nonempty('O campo nome é obrigatório'),
-  model: z.string().nonempty('O campo modelo é obrigatório'),
-  year: z.string().nonempty('O campo ano é obrigatório'),
-  km: z.string().nonempty('O campo km é obrigatório'),
-  price: z.string().nonempty('O campo preço é obrigatório'),
-  city: z.string().nonempty('O campo cidade é obrigatório'),
-  whatsapp: z.string().min(1, 'O campo de whataspp é obrigatóirio').refine((value)=> /^(\d{11,12})$/.test(value),{
-    message:"Numero de telefone inválido"
-  }),
-  description: z.string().nonempty('O campo descrição é obrigatório')
-})
+  name: z.string().nonempty("O campo nome é obrigatório"),
+  model: z.string().nonempty("O campo modelo é obrigatório"),
+  year: z.string().nonempty("O campo ano é obrigatório"),
+  km: z.string().nonempty("O campo km é obrigatório"),
+  price: z.string().nonempty("O campo preço é obrigatório"),
+  city: z.string().nonempty("O campo cidade é obrigatório"),
+  whatsapp: z
+    .string()
+    .min(1, "O campo de whataspp é obrigatóirio")
+    .refine((value) => /^(\d{11,12})$/.test(value), {
+      message: "Numero de telefone inválido",
+    }),
+  description: z.string().nonempty("O campo descrição é obrigatório"),
+});
 
 type FormData = z.infer<typeof schema>;
 
 export function New() {
-
-  const {register, handleSubmit, formState:{errors}, reset} = useForm({
+  const { user } = useContext(AuthContext);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
     resolver: zodResolver(schema),
-    mode: "onChange"
-  })
+    mode: "onChange",
+  });
 
-  function onSubmit(data: FormData){
+  function onSubmit(data: FormData) {
     console.log(data);
-    
   }
+/* 
+  async function handleFile(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.files && event.target.files[0]) {
+      const image = event.target.files[0];
+      if (image != null) {
+        await handleUpload(image)
+      }
+      alert("Envie uma imagem jpeg ou png");
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) return;
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+
+    uploadBytes(uploadRef, image).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        console.log(downloadUrl);
+      });
+    });
+  } */
 
   return (
     <Container>
@@ -46,15 +79,14 @@ export function New() {
               type="file"
               accept="image/*"
               className="opacity-0 cursor-pointer"
+              //onChange={handleFile}
             />
           </div>
         </button>
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flexc flex-col sm:flex-row items-center gap-2 mt-2">
-        <form className="w-full"
-        onSubmit={handleSubmit(onSubmit)}
-        >
+        <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-3">
             <p className="mb-2 font-medium">Nome do Carro</p>
             <Input
@@ -63,7 +95,7 @@ export function New() {
               name="name"
               errors={errors.name?.message}
               placeholder="Ex: Onix 1.0"
-            /> 
+            />
           </div>
 
           <div className="mb-3">
@@ -74,7 +106,7 @@ export function New() {
               name="model"
               errors={errors.model?.message}
               placeholder="Ex: 1.0 flex manual"
-            /> 
+            />
           </div>
 
           <div className="flex w-full mb-3 flex-row items-center gap-4">
@@ -86,7 +118,7 @@ export function New() {
                 name="year"
                 errors={errors.year?.message}
                 placeholder="Ex: 2015/16"
-              /> 
+              />
             </div>
 
             <div className="mb-3">
@@ -97,9 +129,8 @@ export function New() {
                 name="km"
                 errors={errors.km?.message}
                 placeholder="Ex: 115.000"
-              /> 
+              />
             </div>
-
           </div>
 
           <div className="flex w-full mb-3 flex-row items-center gap-4">
@@ -111,7 +142,7 @@ export function New() {
                 name="whatsapp"
                 errors={errors.whatsapp?.message}
                 placeholder="Ex: 11949793053"
-              /> 
+              />
             </div>
 
             <div className="mb-3">
@@ -122,33 +153,39 @@ export function New() {
                 name="city"
                 errors={errors.city?.message}
                 placeholder="Ex: São Paulo"
-              /> 
+              />
             </div>
-
           </div>
           <div className="mb-3">
-              <p className="mb-2 font-medium">Preço</p>
-              <Input
-                type="text"
-                register={register}
-                name="price"
-                errors={errors.price?.message}
-                placeholder="Ex: $295.000"
-              /> 
-            </div>
+            <p className="mb-2 font-medium">Preço</p>
+            <Input
+              type="text"
+              register={register}
+              name="price"
+              errors={errors.price?.message}
+              placeholder="Ex: $295.000"
+            />
+          </div>
 
-            <div className="mb-3">
-              <p className="mb-2 font-medium">Descrição</p>
-              <textarea
+          <div className="mb-3">
+            <p className="mb-2 font-medium">Descrição</p>
+            <textarea
               className="border-2 w-full rounded-md h-24 px-2"
               {...register("description")}
               id="description"
               placeholder="Digite a descrição completa sobre o carro.."
-              />
-              {errors.description && <p className="mb-1 text-red-500">{errors.description.message}</p>}
-            </div>
+            />
+            {errors.description && (
+              <p className="mb-1 text-red-500">{errors.description.message}</p>
+            )}
+          </div>
 
-            <button type="submit" className="w-full h-10 rounded-md bg-zinc-900 text-white font-medium cursor-pointer">Cadastrar</button>
+          <button
+            type="submit"
+            className="w-full h-10 rounded-md bg-zinc-900 text-white font-medium cursor-pointer"
+          >
+            Cadastrar
+          </button>
         </form>
       </div>
     </Container>
