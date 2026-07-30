@@ -24,6 +24,14 @@ const schema = z.object({
   description: z.string().nonempty("O campo descrição é obrigatório"),
 });
 
+/* 
+interface ImageItemProps{
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+} */
+
 type FormData = z.infer<typeof schema>;
 
 export function New() {
@@ -41,7 +49,9 @@ export function New() {
   function onSubmit(data: FormData) {
     console.log(data);
   }
-/* 
+  /* 
+  const [carImages, setCarImages] = useState<ImageItemProp>[]([])
+
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files[0]) {
       const image = event.target.files[0];
@@ -61,9 +71,27 @@ export function New() {
 
     uploadBytes(uploadRef, image).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((downloadUrl) => {
-        console.log(downloadUrl);
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url: downloadUrl,
+        }
+          setCarImages((images)=>{...images, imageItem})
       });
     });
+
+    async function handleDeleteImage(item: ImageItemProps){
+      const imagePath = `images/${item.uid}/${item.name}`;
+      const imaeRef = ref(storage, imagePath)
+
+      try{
+        await deleteObject(imageRef);
+        setCarsImages(carImages.filter((car)=> car.url !== item.url))
+      }catch(e){
+        console.log("ERROR:", e);
+      }
+    }
   } */
 
   return (
@@ -83,6 +111,23 @@ export function New() {
             />
           </div>
         </button>
+        {
+          {
+            /* 
+            {carImages.map((item)=>{
+              <div key={item.name} className="w-full h-32 flex items-center justify-center relative">
+              <button className="absolute" onclick={handleDeleteImage(item)}>
+              <fiTrash size={28} color="#FFF" />
+              </button>
+                <img src={item.previewURL}
+                  className="rounded-lg w-full h-32 object-cover"
+                alt="Foto do carro"
+                >
+              </div>
+            })}
+          */
+          }
+        }
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flexc flex-col sm:flex-row items-center gap-2 mt-2">
