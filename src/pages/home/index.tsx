@@ -23,6 +23,7 @@ interface CarImagesProps {
 
 export function Home() {
   const [cars, setCars] = useState<CarProps[]>([]);
+  const [loading, setLoading] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadCars() {
@@ -50,6 +51,10 @@ export function Home() {
     loadCars();
   }, []);
 
+  function handleImageLoad(id: string): void {
+    setLoading((prevLoading) => [...prevLoading, id]);
+  }
+
   return (
     <Container>
       <section className="bg-white p-4 rounded-lg w-full max-w-3xl mx-auto flex justify-center items-center gap-2">
@@ -68,10 +73,16 @@ export function Home() {
         {cars.map((car) => (
           <Link to={`/car/${car.id}`} key={car.id}>
             <section className="w-full bg-white rounded-lg">
+              {/* Evitando layout shift */}
+              <div className="w-full rounded-lg mb-2 max-h-72 hover:scale-105 transition-all"
+              style={{display: loading.includes(car.id) ? "none" : "block"}}
+              ></div>
               <img
                 className="w-full rounded-lg mb-2 max-h-72 hover:scale-105 transition-all"
                 src="https://files.hodoor.world/main/39f9eaba-d1ab-431a-ac30-bfa3ae5c9487.jpeg" //src={car.images[0].url}
                 alt="Carro"
+                onLoad={() => handleImageLoad(car.id)}
+                style={{display: loading.includes(car.id) ? "block" : "none"}}
               />
               <p className="font-bold mt-1 mb-2 px-2">{car.name}</p>
               <div className="flex flex-col px-2">
