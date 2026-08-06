@@ -7,6 +7,8 @@ import { Container } from "../../../components/container";
 import { Input } from "../../../components/input";
 import { PanelHeader } from "../../../components/PanelHeader";
 import { AuthContext } from "../../../context/AuthContext";
+import { db } from "../../../services/firebaseConnection";
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -47,7 +49,38 @@ export function New() {
   });
 
   function onSubmit(data: FormData) {
-    console.log(data);
+    //if(carImage.lenght === 0) return alert("Envie pelo menos 1 imagem deste carro!");
+    /*
+      const carListImages = carImages.map((car)=>{
+        return{`
+          uid: car.uid,
+          name: car.name,
+          url: car.url
+        }
+      }) 
+     */
+    addDoc(collection(db, "cars"), {
+      name: data.name,
+      model: data.model,
+      whatsapp: data.whatsapp,
+      city: data.city,
+      year: data.year,
+      km: data.km,
+      price: data.price,
+      description: data.description,
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      //images: carListImages
+    })
+      .then(() => {
+        reset();
+        //setCarImages([])
+        console.log("Cadastrado com sucesso");
+      })
+      .catch((e) => {
+        console.log("Error ao cadastrar no banco", e);
+      });
   }
   /* 
   const [carImages, setCarImages] = useState<ImageItemProp>[]([])
@@ -111,9 +144,7 @@ export function New() {
             />
           </div>
         </button>
-        {
-          {
-            /* 
+        {/* 
             {carImages.map((item)=>{
               <div key={item.name} className="w-full h-32 flex items-center justify-center relative">
               <button className="absolute" onclick={handleDeleteImage(item)}>
@@ -125,9 +156,7 @@ export function New() {
                 >
               </div>
             })}
-          */
-          }
-        }
+          */}
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flexc flex-col sm:flex-row items-center gap-2 mt-2">
