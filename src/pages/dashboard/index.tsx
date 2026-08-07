@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Container } from "../../components/container";
 import { PanelHeader } from "../../components/PanelHeader";
 import { FiTrash2 } from "react-icons/fi";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc} from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -48,20 +48,28 @@ export function Dashboard() {
             //images: doc.data().images,
           });
         });
-        console.log("Cars: ", listCars);
-
         setCars(listCars);
       });
     }
     loadCars();
   }, [user]);
 
+  async function handleDeleteCar(id: string) {
+    if (!user?.uid) return;
+
+    const docRef = doc(db, "cars", id);
+    await deleteDoc(docRef);
+    
+    setCars(cars.filter((car) => car.id !== id));
+  }
+
   return (
     <Container>
       <PanelHeader />
       <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <section className="w-full bg-white rounded-lg relative">
-          <button onClick={() => {}}
+        {cars.map((car) => (
+                  <section className="w-full bg-white rounded-lg relative">
+          <button onClick={() => handleDeleteCar(car.id)}
            className="absolute bg-white rounded-full w-14 h-14 items-center justify-center flex right-2 top-2 drop-shadow">
             <FiTrash2 size={26} color="#000" />
           </button>
@@ -70,16 +78,17 @@ export function Dashboard() {
             src="https://files.hodoor.world/main/39f9eaba-d1ab-431a-ac30-bfa3ae5c9487.jpeg"
             alt=""
           />
-          <p className="font-bold mt-1 mb-2 px-2">Nome do Carro</p>
+          <p className="font-bold mt-1 mb-2 px-2">{car.name}</p>
           <div className="flex flex-col px-2">
-            <span className="text-zinc-700">2020 - 15.000 km</span>
-            <strong className="text-black font-bold mt-4">R$ 100.000,00</strong>
+            <span className="text-zinc-700">{car.year} - {car.km} km</span>
+            <strong className="text-black font-bold mt-4">R$ {car.price.toLocaleString("pt-BR")}</strong>
           </div>
           <div className="w-full h-px bg-slate-200 my-2"></div>
           <div className="px-2 pb-2">
-            <span className="text-black">São Paulo - SP</span>
+            <span className="text-black">{car.city}</span>
           </div>
         </section>
+        ))}
       </main>
     </Container>
   );
