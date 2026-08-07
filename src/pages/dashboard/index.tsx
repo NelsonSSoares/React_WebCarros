@@ -5,6 +5,7 @@ import { FiTrash2 } from "react-icons/fi";
 import { collection, getDocs, query, where, deleteDoc, doc} from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { AuthContext } from "../../context/AuthContext";
+//import {ref, deleteObject} from "firebase/storage";
 
 interface CarProps {
   id: string;
@@ -54,13 +55,25 @@ export function Dashboard() {
     loadCars();
   }, [user]);
 
-  async function handleDeleteCar(id: string) {
+  async function handleDeleteCar(carId: string) {
     if (!user?.uid) return;
 
-    const docRef = doc(db, "cars", id);
+    const docRef = doc(db, "cars", carId);
     await deleteDoc(docRef);
-    
-    setCars(cars.filter((car) => car.id !== id));
+    /*
+      car.images.map(async (image) => {
+         const imagePath = `images/${user.uid}/${image.name}`;
+         const imageRef = ref(storage, imagePath);
+         try{
+          await deleteObject(imageRef);
+         }catch(error){
+          console.log("Error deleting image: ", error);
+          }
+      })
+
+    */
+    setCars(cars.filter((c) => c.id !== carId));
+
   }
 
   return (
