@@ -1,7 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Container } from "../../components/container";
 import { db } from "../../services/firebaseConnection";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -38,12 +38,15 @@ export function CardDetails() {
     "https://thumbs.dreamstime.com/b/toyota-vermelha-de-supra-em-um-show-carros-jakarta-indonesia-november-red-mk-car-este-foi-feito-com-joint-venture-da-bmw-245012178.jpg",
     "https://img.benlevy.com/auto/meet/oakparkcarscoffee20210912/img_7955.jpg",
   ]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadCarDetails() {
       if (!id) return;
       const docRef = doc(db, "cars", id);
       getDoc(docRef).then((snapshot) => {
+        if (!snapshot.data()) navigate("/");
+
         setCar({
           id: snapshot.id,
           name: snapshot.data()?.name,
@@ -81,31 +84,32 @@ export function CardDetails() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
 
   return (
     <Container>
-      <Swiper
-        slidesPerView={slidesPerView}
-        pagination={{ clickable: true }}
-        navigation={true}
-        className=""
-      >
-        {/*         {car?.images?.map((image, index) => (
+      {imageWeb && (
+        <Swiper
+          slidesPerView={slidesPerView}
+          pagination={{ clickable: true }}
+          navigation={true}
+          className=""
+        >
+          {/*         {car?.images?.map((image, index) => (
           <SwiperSlide key={index}>
             <img src={image.url} alt={image.name} className="w-full h-96 object-cover rounded-lg" />
           </SwiperSlide>
         ))} */}
-        {imageWeb.map((image, index) => (
-          <SwiperSlide key={index}>
-            <img
-              src={image}
-              alt={`Image ${index + 1}`}
-              className="w-full h-96 object-cover rounded-lg"
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+          {imageWeb.map((image, index) => (
+            <SwiperSlide key={index}>
+              <img
+                src={image}
+                alt={`Image ${index + 1}`}
+                className="w-full h-96 object-cover rounded-lg"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
 
       {car && (
         <main className="w-full bg-white rounded-lg p-6 my-4">
@@ -142,7 +146,7 @@ export function CardDetails() {
           <p className="mb-4">{car?.whatsapp}</p>
           <a
             className="bg-green-500 text-white gap-2 my-6 flex items-center justify-center h-11 text-xl rounded-lg font-medium cursor-pointer"
-            href={`https://wa.me/${car?.whatsapp}`}
+            href={`https://api.whatsapp.com/send?phone=${car?.whatsapp}&text=Olá, tenho interesse no seu carro ${car?.name} anunciado no WebCarros!`}
             target="_blank"
             rel="noopener noreferrer"
           >
