@@ -9,6 +9,7 @@ import { PanelHeader } from "../../../components/PanelHeader";
 import { AuthContext } from "../../../context/AuthContext";
 import { db } from "../../../services/firebaseConnection";
 import { addDoc, collection } from "firebase/firestore";
+import { toast } from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().nonempty("O campo nome é obrigatório"),
@@ -77,8 +78,10 @@ export function New() {
         reset();
         //setCarImages([])
         console.log("Cadastrado com sucesso");
+        toast.success("Carro cadastrado com sucesso!");
       })
       .catch((e) => {
+        toast.error("Erro ao cadastrar o carro. Tente novamente.");
         console.log("Error ao cadastrar no banco", e);
       });
   }

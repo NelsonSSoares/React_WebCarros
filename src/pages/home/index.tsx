@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { collection, query, getDocs, orderBy, where } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 interface CarProps {
   id: string;
@@ -66,12 +67,20 @@ export function Home() {
     setCars([]);
     //setLoadImages();
 
-    const q = query(collection(db, "cars"),
-     where("name", ">=", inputValue.toUpperCase()) ,
-      where("name", "<=", inputValue.toUpperCase() + "\uf8ff") ,
+    const q = query(
+      collection(db, "cars"),
+      where("name", ">=", inputValue.toUpperCase()),
+      where("name", "<=", inputValue.toUpperCase() + "\uf8ff")
     );
 
     const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      toast.error("nenhum carro encontrado com esse nome",);
+      setCars([]);
+      return;
+    }
+
     const listCars = [] as CarProps[];
     querySnapshot.forEach((doc) => {
       listCars.push({

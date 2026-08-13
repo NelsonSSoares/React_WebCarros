@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const schema = z.object({
   name: z.string().nonempty("O nome é obrigatório"),
@@ -50,8 +51,10 @@ export function Register() {
         email: data.email
       });
       console.log("User registered successfully");
+      toast.success("Cadastro realizado com sucesso!");
       navigate("/dashboard", {replace: true});
     }).catch((error)=>{
+      toast.error("Erro ao cadastrar usuário. Verifique suas credenciais.");
       console.log("Error registering user:", error);
     });
   }

@@ -9,6 +9,7 @@ import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import {auth} from '../../services/firebaseConnection';
 import { useNavigate } from 'react-router-dom';
 import {useEffect} from 'react';
+import toast from 'react-hot-toast';
 
 const schema = z.object({
   email: z.string().email("Digite um email válido").nonempty("O email é obrigatório"),
@@ -28,8 +29,10 @@ export function Login() {
     signInWithEmailAndPassword(auth, data.email, data.password)
     .then((user)=>{
       console.log("User logged in successfully", user);
+      toast.success("Login realizado com sucesso!");
       navigate("/dashboard", {replace: true});
     }).catch((error)=>{
+      toast.error("Erro ao fazer login. Verifique suas credenciais.");
       console.log("Error logging in user:", error);
     });
   }
